@@ -1,0 +1,28 @@
+name: Build Firmware
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip3 install platformio
+
+      - name: Run PlatformIO
+        run: platformio run
+
+      - name: Set release tag
+        run: echo "RELEASE_TAG=$(date +%Y%m%d)" >> $GITHUB_ENV
+
+      - name: Upload to Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: .pio/build/dc1/firmware.bin
